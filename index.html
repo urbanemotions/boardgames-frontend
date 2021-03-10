@@ -8,18 +8,31 @@
 </head>
 
 <body>
-	<div id="list-panel">
-		<ul id="bg-list">
-		</ul>
-	</div>
+    <header> 
+        <h1>Board Games Rank</h1>
+	    <div id="list-panel">
+		    <ol id="bg-list">
+		    </ol>
+	    </div>
+    </header>
 	
-    <div id="show-bg-panel"></div>
+    <main> 
+        <div id="show-bg-panel"></div>
     
-    <div id="show-r-panel">
-        <ul id="r-list">
-		</ul>
-    </div>
-	
+        <h1>Reviews</h1>
+        <div id="show-r-panel">
+            <ul id="r-list">
+		    </ul>
+        </div>
+
+        <h1>Please leave a Review</h1>
+        <form class="review-form">
+          <textarea></textarea>
+          <input type="submit" value="Submit">
+        </form>
+
+    </main>
+
     <script type="text/javascript" src="./src/index.js"></script>
 </body>
 

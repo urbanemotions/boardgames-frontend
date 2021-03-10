@@ -1,4 +1,5 @@
 const baseURL = "http://localhost:3000/api/v1/boardgames"
+const reviewURL = "http://localhost:3000/api/v1/reviews"
 
 document.addEventListener("DOMContentLoaded", function() {
     
@@ -7,9 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const listPanel = document.querySelector("#bg-list")
     const showBGPanel = document.querySelector("#show-bg-panel")
     const showRPanel = document.querySelector("#r-list")
-
-    // event listeners - 
-    // showBGPanel.addEventListener('click', handle) ???i dont think i need this???
+    const reviewForm = document.querySelector(".review-form")
 
     // functions 
     // fetch all board games
@@ -17,18 +16,30 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(baseURL)
         .then(res => res.json())
         .then(boardgames => listOfBoardGames(boardgames))
+        // not sure if i can do this 1*
+        // .then(reviews => listOfReviews(reviews))
     }
 
     // create li for each board game
     function listOfBoardGames(boardgames) {
         boardgames.forEach(boardgame => boardgameLi(boardgame))
     }
+    // not sure if i can do this 1*
+    // function listOfReviews(reviews) {
+    //     reviews.forEach(review => boardgameLi(boardgame))
+    // }
 
     function boardgameLi(boardgame) {
         const li = document.createElement('li')
         li.dataset.boardgameId = boardgame.id
         li.textContent = boardgame.name
         li.addEventListener('click', showBoardGame)
+        // li.addEventListener('click', showReview)
+        // i need this click to open board games and the relevant reviews
+        // li.addEventListener('click', () => {    
+        //     showBoardGame;
+        //     showReview;
+        // });
         listPanel.appendChild(li)
     }
 
@@ -46,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <h2>Playing Time: ${boardgame.duration}</h2>
                     <h2>Number Of Players: ${boardgame.num_of_players}</h2>
                     <h2>Age Requirements: ${boardgame.age_requirements}</h2>
-                    <p>Description: ${boardgame.description}</p>               
+                    <p>Description: ${boardgame.description}</p>   
                 </div>`
                 showBGPanel.innerHTML = boardGameShow
             })
@@ -56,8 +67,9 @@ document.addEventListener("DOMContentLoaded", function() {
             //         <p>Review: ${review.content}</p>               
             //         </div>`
             //         showRPanel.innerHTML = boardGameShow
-            // })
-       }
+            // }) 
+            // <p>Reviews: ${boardgame.reviews.content}</p> 
+    }
 
     // fetch one board game by id
     function getOneBoardGame(id) {
@@ -65,15 +77,72 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(res => res.json())
     }
 
+    // showRPanel.addEventListener('submit', event => {
+    //     event.preventDefault()
+    //     let review = event.target.reviews
+    //     fetch(baseURL, {
+    //         method: 'GET',
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Accept": "application/json"
+    //         }, 
+    //         body: JSON.stringify({
+    //             reviews
+    //         })
+    //     })
+    //     .then(res => res.json())
+    //     .then(reviews => listOfReviews(reviews))
+    // })
 
+    // function showReview(event) {
+    //     const id = event.target.dataset.reviewId
+    //     getReview(id)
+    //         .then(review => {
+    //             const reviewShow = `<div>
+    //                 <p>Review: ${review.content}</p>               
+    //             </div>`
+    //             showRPanel.innerHTML = reviewShow
+    //         })
+    // }
 
+    // function getReview() {
+    //     return fetch(reviewURL + `/${id}`)
+    //         .then(res => res.json())
+    // }
 
+    reviewForm.addEventListener('submit', event => {
+        event.preventDefault()
+        let review = event.target.reviews.content
+        console.dir(event.target.children[0].content);
+        const newReview = {
+            reviews: reviewForm.reviews.content
+        }
+        fetch(baseURL, {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
+            body: JSON.stringify(newReview)
+        })
+        .then(res => res.json())
+        .then(boardgames => {
+            const reviews = document.querySelectorAll(reviews)
+            listOfBoardGames(boardgames) 
+        })
+    })
 
-
-
-
-
-
+    function updateReview(event) {
+        event.preventDefault()
+        const id = event.target.dataset.id
+        getOneBoardGame(id) 
+        .then(boardgame => {
+            const reviewSection = `<div> 
+                <p>Reviews: ${boardgame.reviews.content}</p>
+            </div>`
+            showRPanel.innerHTML = reviewSection  
+        })
+    }
 
     getAllBoardGames() 
 
