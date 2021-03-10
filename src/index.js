@@ -36,31 +36,44 @@ document.addEventListener("DOMContentLoaded", function() {
     // gets the selected board game and display it in the showBGPanel
     // no need for button as no changes can be made to the board game 
     function showBoardGame(event) {
-        // console.log("this")
         const id = event.target.dataset.boardgameId
         getOneBoardGame(id)
-        // return fetch(baseURL + `/${id}`)
-        //     .then(res => res.json())
             .then(boardgame => {
                 const boardGameShow = `<div>
                     <img alt = "board game image" src="${boardgame.image_url}" />
                     <h1>${boardgame.name}</h1>
-                    <h1>${boardgame.theme}</h1>
-                    <h1>${boardgame.duration}</h1>
-                    <h1>${boardgame.num_of_players}</h1>
-                    <h1>${boardgame.age_requirements}</h1>
-                    <p>${boardgame.description}</p>                
+                    <h2>Type: ${boardgame.theme}</h2>
+                    <h2>Playing Time: ${boardgame.duration}</h2>
+                    <h2>Number Of Players: ${boardgame.num_of_players}</h2>
+                    <h2>Age Requirements: ${boardgame.age_requirements}</h2>
+                    <p>Description: ${boardgame.description}</p>               
                 </div>`
                 showBGPanel.innerHTML = boardGameShow
             })
+            // promise errors !!!!!!!
+            // .then(review => {
+            //     const reviewShow = `<div>
+            //         <p>Review: ${review.content}</p>               
+            //         </div>`
+            //         showRPanel.innerHTML = boardGameShow
+            // })
        }
 
-    // couldnt get it to work so cant break up to smaller methods 
     // fetch one board game by id
     function getOneBoardGame(id) {
         return fetch(baseURL + `/${id}`)
             .then(res => res.json())
     }
+
+
+
+
+
+
+
+
+
+
 
     getAllBoardGames() 
 
