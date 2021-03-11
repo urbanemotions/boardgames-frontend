@@ -1,6 +1,8 @@
 const baseURL = "http://localhost:3000/api/v1/boardgames"
 const reviewURL = "http://localhost:3000/api/v1/reviews"
+const userURL = "http://localhost:3000/api/v1/users"
 let boardgame_id = 0
+let currentUser = {}
 
 document.addEventListener("DOMContentLoaded", function() {
     
@@ -8,8 +10,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // index.html-body-div sections
     const listPanel = document.querySelector("#bg-list")
     const showBGPanel = document.querySelector("#show-bg-panel")
+    const userForm = document.querySelector(".user-form")
     const reviewForm = document.querySelector(".review-form")
-
+   
     // functions 
     // fetch all board games
     function getAllBoardGames() {
@@ -25,12 +28,6 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(boardgame.reviews)
         })
     }
-
-    // create li for each review
-    // function listOfReviews(reviews) {
-    //     reviews.forEach(review => reviewLi(boardgame))
-    //     // console.log(review:, content);
-    // }
 
     function boardgameLi(boardgame) {
         const li = document.createElement('li')
@@ -50,43 +47,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // click
     // gets the selected board game and display it in the showBGPanel
-    // no need for button as no changes can be made to the board game 
+    // no need for button as no changes can be made to the board game
     function showBoardGame(boardgame, event) {
-        // keeps adding to the page!!!!!! need to fix
-        // const id = event.target.dataset.boardgameId
-        // getOneBoardGame(id)
-        //     .then(boardgame => {
+        showBGPanel.innerHTML = '';
         boardgame_id = boardgame.id 
         let div = document.createElement('div')
         let ul = document.createElement('ul')
+        ul.id = "review-list"
+        // dont think i need this?
         // ul.dataset.boardgameId = boardgame.id
         let boardGameImage = document.createElement('img')
         boardGameImage.src = `${boardgame.image_url}`
-        let name = document.createElement('li')
+        let name = document.createElement('h1')
         name.textContent = `Name: ${boardgame.name}`
-        let theme = document.createElement('li')
+        let theme = document.createElement('h2')
         theme.textContent = `Type: ${boardgame.theme}`
-        let duration = document.createElement('li')
+        let duration = document.createElement('h2')
         duration.textContent = `Playing Time: ${boardgame.duration}`
-        let playernum = document.createElement('li')
+        let playernum = document.createElement('h2')
         playernum.textContent = `Number of Players: ${boardgame.num_of_players}`
-        let age = document.createElement('li')
+        let age = document.createElement('h2')
         age.textContent = `Age Requirements: ${boardgame.age_requirements}`
-        let description = document.createElement('li')
+        let description = document.createElement('h3')
         description.textContent = `Description: ${boardgame.description}`
-        // couldnt get this to display the review heading -- not sure why!
-        // let reviewHeading = document.createElement('li')
-        // reviewHeading.textContent = `Reviews: `
+        let reviewHeading = document.createElement('h1')
+        reviewHeading.textContent = `Reviews: `
 
         boardgame.reviews.forEach(review => {
             let reviewBG = document.createElement('li')
-            reviewBG.innerText = `${review.user.name}'s - ${review.content}` 
+            reviewBG.innerText = `${review.user.name}: ${review.content}` 
             ul.appendChild(reviewBG)
-            // let reviewButton = document.createElement('button')
-            // reviewButton.textContent = "SUBMIT"
         })
-        
-        div.append(boardGameImage, name, theme, duration, playernum, age, description, ul)
+        div.append(boardGameImage, name, theme, duration, playernum, age, description, reviewHeading, ul)
         showBGPanel.appendChild(div)
     }
 
@@ -96,50 +88,78 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(res => res.json())
     }
 
+    // create a user using form
+    userForm.addEventListener('submit', event => {
+        event.preventDefault()
+        let newUser = document.getElementById("u-list").value;   
+        fetch(userURL, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
+            body: JSON.stringify({
+                newUser
+            })
+        })
+        .then(res => res.json())
+        .then(user => currentUser = user)
+    })
+
     // create a review using form
     reviewForm.addEventListener('submit', event => {
         event.preventDefault()
-        // let review = event.target.boardgame.review.content
-        let review = document.getElementById("r-list").value;
-        // console.dir(event.target.children[0].content);
-        
+        let reviewContent = document.getElementById("r-list").value;
         const newReview = {
-            review: review,
-            boardgameId: boardgame_id 
+            review: reviewContent,
+            boardgameId: boardgame_id, 
+            userId: currentUser.id
         }   
-
         fetch(reviewURL, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             }, 
-            body: JSON.stringify(newReview)
+            body: JSON.stringify(
+                newReview
+            )
+        })
+        .then(res => res.json())
+        .then(review => {
+            const ul = document.querySelector("#review-list")
+            let reviewBG = document.createElement('li')
+            reviewBG.innerText = `${review.user.name}'s - ${review.content}` 
+            ul.appendChild(reviewBG)
+        })
+    })
+
+    function updateReview(event) {
+        event.preventDefault()
+        const id = event.target.dataset.id
+        // getOneBoardGame(id) 
+        // .then(boardgame => {
+        //     const reviewSection = `<div> 
+        //         <p>Reviews: ${boardgame.reviews.content}</p>
+        //     </div>`
+        //     showRPanel.innerHTML = reviewSection  
+        fetch(reviewURL, {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
+            body: JSON.stringify(updateReview)
         })
         .then(res => res.json())
         .then(boardgames => {
             const reviews = document.querySelectorAll(reviews)
             listOfBoardGames(boardgames) 
         })
-    })
 
-
-
-
-
-
-
-    function updateReview(event) {
-        event.preventDefault()
-        const id = event.target.dataset.id
-        getOneBoardGame(id) 
-        .then(boardgame => {
-            const reviewSection = `<div> 
-                <p>Reviews: ${boardgame.reviews.content}</p>
-            </div>`
-            showRPanel.innerHTML = reviewSection  
-        })
-    }
+            // let updateButton = document.createElement('button')
+            // updateButton.textContent = "UPDATE"
+        }
 
     getAllBoardGames() 
 });
@@ -156,12 +176,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
-
-
-
-
-
+    // create li for each review
+    // function listOfReviews(reviews) {
+    //     reviews.forEach(review => reviewLi(boardgame))
+    //     // console.log(review:, content);
+    // }
 
             // promise errors !!!!!!!
             // .then(review => {
@@ -171,59 +190,6 @@ document.addEventListener("DOMContentLoaded", function() {
             //         showRPanel.innerHTML = boardGameShow
             // }) 
             //  
-
-
-    // function showBoardGame(event) {
-    //             const div = document.createElement('div')
-    //             const li = document.createElement('li')
-    //             // li.dataset.boardgameId = boardgame.id
-    //             const img = document.createElement('img')
-    //             img.src = boardgame.image_url
-    //             const name = document.createElement('li')
-    //             name.innerText = boardgame.name
-    //             const theme = document.createElement('li')
-    //             theme.innerText = boardgame.theme
-    //             const duration = document.createElement('li')
-    //             duration.innerText = boardgame.duration
-    //             const playernum = document.createElement('li')
-    //             playernum.innerText = boardgame.num_of_players
-    //             const age = document.createElement('li')
-    //             age.innerText = boardgame.age_requirements
-    //             const description = document.createElement('li')
-    //             description.innerText = boardgame.description
-    //             const review = document.createElement('li')
-    //             const reviewButton = document.createElement('button')
-    //             reviewButton.innerText = "SUBMIT"
-    //             div.append(img, name, theme, duration, playernum, age, description, review, reviewButton)
-    //             showBGPanel.appendChild(div)
-    // }
-
-
-    // function showBoardGame(event) {
-    //     let div = document.createElement('div')
-    //     let li = document.createElement('li')
-    //     // li.dataset.boardgameId = boardgame.id
-    //     let boardGameImage = document.createElement('img')
-    //     boardGameImage.src = boardgame.image_url
-    //     let name = document.createElement('li')
-    //     name.textContent = boardgame.name
-    //     let theme = document.createElement('li')
-    //     theme.textContent = boardgame.theme
-    //     let duration = document.createElement('li')
-    //     duration.textContent = boardgame.duration
-    //     let playernum = document.createElement('li')
-    //     playernum.textContent = boardgame.num_of_players
-    //     let age = document.createElement('li')
-    //     age.textContent = boardgame.age_requirements
-    //     let description = document.createElement('li')
-    //     description.textContent = boardgame.description
-    //     let review = document.createElement('li')
-    //     let reviewButton = document.createElement('button')
-    //     reviewButton.textContent = "SUBMIT"
-    //     div.append(img, name, theme, duration, playernum, age, description, review, reviewButton)
-    //     showBGPanel.appendChild(div)
-    // }
-
 
     // function showReview(event) {
     //     event.preventDefault()
@@ -237,23 +203,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //         })
     // }
 
-    // showRPanel.addEventListener('submit', event => {
-    //     
-    //     let review = event.target.reviews
-    //     fetch(baseURL, {
-    //         method: 'GET',
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //             "Accept": "application/json"
-    //         }, 
-    //         body: JSON.stringify({
-    //             reviews
-    //         })
-    //     })
-    //     .then(res => res.json())
-    //     .then(reviews => listOfReviews(reviews))
-    // })
-
+    
     // function getReview() {
     //     return fetch(reviewURL + `/${id}`)
     //         .then(res => res.json())
@@ -276,6 +226,3 @@ document.addEventListener("DOMContentLoaded", function() {
     //             showBGPanel.innerHTML = boardGameShow
     //         })
     // }
-
-    // dont think i need this, took out r-lst in html file
-    // const showRPanel = document.querySelector("#r-list")
