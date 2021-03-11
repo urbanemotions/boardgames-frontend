@@ -1,5 +1,5 @@
 const baseURL = "http://localhost:3000/api/v1/boardgames"
-const reviewURL = "http://localhost:3000/api/v1/reviews"
+// const reviewURL = "http://localhost:3000/api/v1/reviews"
 
 document.addEventListener("DOMContentLoaded", function() {
     
@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // index.html-body-div sections
     const listPanel = document.querySelector("#bg-list")
     const showBGPanel = document.querySelector("#show-bg-panel")
-    const showRPanel = document.querySelector("#r-list")
+    // dont think i need this, took out r-lst in html file
+    // const showRPanel = document.querySelector("#r-list")
     const reviewForm = document.querySelector(".review-form")
 
     // functions 
@@ -71,38 +72,43 @@ document.addEventListener("DOMContentLoaded", function() {
     //         })
     // }
 
-    function showBoardGame(boardgame) {
-        // console.log(boardgame)
+    function showBoardGame(boardgame, event) {
+        // keeps adding to the page!!!!!! need to fix
+        // const id = event.target.dataset.boardgameId
+        // getOneBoardGame(id)
+        //     .then(boardgame => {
         let div = document.createElement('div')
-        let li = document.createElement('li')
-        li.dataset.boardgameId = boardgame.id
+        let ul = document.createElement('ul')
+        // ul.dataset.boardgameId = boardgame.id
         let boardGameImage = document.createElement('img')
-        boardGameImage.src = boardgame.image_url
+        boardGameImage.src = `${boardgame.image_url}`
         let name = document.createElement('li')
-        name.textContent = boardgame.name
+        name.textContent = `Name: ${boardgame.name}`
         let theme = document.createElement('li')
-        theme.textContent = boardgame.theme
+        theme.textContent = `Type: ${boardgame.theme}`
         let duration = document.createElement('li')
-        duration.textContent = boardgame.duration
+        duration.textContent = `Playing Time: ${boardgame.duration}`
         let playernum = document.createElement('li')
-        playernum.textContent = boardgame.num_of_players
+        playernum.textContent = `Number of Players: ${boardgame.num_of_players}`
         let age = document.createElement('li')
-        age.textContent = boardgame.age_requirements
+        age.textContent = `Age Requirements: ${boardgame.age_requirements}`
         let description = document.createElement('li')
-        description.textContent = boardgame.description
+        description.textContent = `Description: ${boardgame.description}`
+        // couldnt get this to display the review heading 
+        // let reviewHeading = document.createElement('li')
+        // reviewHeading.textContent = `Reviews:`
 
-        // boardgame.reviews.forEach(review => {
-        //     let reviewBG = document.createElement('li')
-        //     let reviewButton = document.createElement('button')
-        //     reviewButton.textContent = "SUBMIT"
-        // })
-            boardgame.reviews.forEach(review => reviewLi(review, ul))
+
+        boardgame.reviews.forEach(review => {
+            let reviewBG = document.createElement('li')
+            reviewBG.innerText = `${review.content}` 
+            ul.appendChild(reviewBG)
+            // let reviewButton = document.createElement('button')
+            // reviewButton.textContent = "SUBMIT"
+        })
         
-        div.append(boardGameImage, name, theme, duration, playernum, age, description)
+        div.append(boardGameImage, name, theme, duration, playernum, age, description, ul)
         showBGPanel.appendChild(div)
-
-        // 
-        //create ul and make li and append 
     }
 
     // fetch one board game by id
@@ -110,19 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return fetch(baseURL + `/${id}`)
             .then(res => res.json())
     }
-
-    function reviewLi(review, ul) {
-        let li = document.createElement('li')
-        li.textContent = `${boardgame.name}`
-        let btn = document.createElement('submit')
-        btn.textContent = 'Submit'
-        btn.className = 'submit'
-        li.appendChild(btn)
-        ul.appendChild(li)
-    }
-
  
-
     reviewForm.addEventListener('submit', event => {
         event.preventDefault()
         let review = event.target.reviews.content
