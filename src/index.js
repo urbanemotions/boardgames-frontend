@@ -1,12 +1,13 @@
 const baseURL = "http://localhost:3000/api/v1/boardgames"
 const reviewURL = "http://localhost:3000/api/v1/reviews"
 const userURL = "http://localhost:3000/api/v1/users"
+// global variables 
 let boardgame_id = 0
 let currentUser = {}
+let review_id = 0
 
 document.addEventListener("DOMContentLoaded", function() {
     
-    // variables 
     // index.html-body-div sections
     const listPanel = document.querySelector("#bg-list")
     const showBGPanel = document.querySelector("#show-bg-panel")
@@ -34,14 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
         li.dataset.boardgameId = boardgame.id
         li.textContent = boardgame.name
         li.addEventListener('click', ()=> {showBoardGame(boardgame)})
-        listPanel.appendChild(li)
-    }
-
-    function reviewLi(review) {
-        const li = document.createElement('li')
-        li.dataset.reviewId = review.id
-        li.textContent = review.content
-        li.addEventListener('click', showReview)
         listPanel.appendChild(li)
     }
 
@@ -76,7 +69,16 @@ document.addEventListener("DOMContentLoaded", function() {
         boardgame.reviews.forEach(review => {
             let reviewBG = document.createElement('li')
             reviewBG.innerText = `${review.user.name}: ${review.content}` 
+            review_id = review.id
+            // ul.dataset.reviewId = review.id
+            const button = document.createElement('button')
+            // button.textContent = "UPDATE"
+            // button.addEventListener('click', ()=> {updateReview(review)})
+            button.textContent = "Delete"
+            button.addEventListener('click', ()=> {deleteReview(review_id)})
+            
             ul.appendChild(reviewBG)
+            ul.appendChild(button)
         })
         div.append(boardGameImage, name, theme, duration, playernum, age, description, reviewHeading, ul)
         showBGPanel.appendChild(div)
@@ -129,21 +131,25 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(review => {
             const ul = document.querySelector("#review-list")
             let reviewBG = document.createElement('li')
-            reviewBG.innerText = `${review.user.name}'s - ${review.content}` 
+            reviewBG.innerText = `${review.user.name}: ${review.content}` 
+            const button = document.createElement('button')
+            button.textContent = "Delete"
+            button.addEventListener('click', ()=> {deleteReview(review.id)})
+                //     li.dataset.reviewId = review.id
             ul.appendChild(reviewBG)
+            ul.appendChild(button)
         })
     })
 
-    function updateReview(event) {
-        event.preventDefault()
-        const id = event.target.dataset.id
-        // getOneBoardGame(id) 
-        // .then(boardgame => {
-        //     const reviewSection = `<div> 
-        //         <p>Reviews: ${boardgame.reviews.content}</p>
-        //     </div>`
-        //     showRPanel.innerHTML = reviewSection  
-        fetch(reviewURL, {
+    function updateReview(review) {
+        // event.preventDefault()
+        // const id = event.target.dataset.id
+        let updateReview = {
+            review: review_id,
+            boardgameId: boardgame_id, 
+            userId: currentUser.id
+        }  
+        fetch(reviewURL + `/${id}`, {
             method: 'PATCH',
             headers: {
                 "Content-Type": "application/json",
@@ -152,62 +158,31 @@ document.addEventListener("DOMContentLoaded", function() {
             body: JSON.stringify(updateReview)
         })
         .then(res => res.json())
-        .then(boardgames => {
-            const reviews = document.querySelectorAll(reviews)
-            listOfBoardGames(boardgames) 
-        })
-
-            // let updateButton = document.createElement('button')
+        .then(review => {
+            const ul = document.querySelector("#review-list")
+            // const updateButton = document.createElement('button')
             // updateButton.textContent = "UPDATE"
-        }
+            // ul.appendChild(reviewBG)
+        })
+    }
 
+// delete review instead of update review 
+    function deleteReview(review_id) {
+        fetch(`${reviewURL}/${review_id}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(() => {
+            let dReview = document.getElementById(review_id)
+            dReview.remove()
+        })
+    }
     getAllBoardGames() 
 });
 
 
 
 
-
-
-
-
-
-
-
-
-
-    // create li for each review
-    // function listOfReviews(reviews) {
-    //     reviews.forEach(review => reviewLi(boardgame))
-    //     // console.log(review:, content);
-    // }
-
-            // promise errors !!!!!!!
-            // .then(review => {
-            //     const reviewShow = `<div>
-            //         <p>Review: ${review.content}</p>               
-            //         </div>`
-            //         showRPanel.innerHTML = boardGameShow
-            // }) 
-            //  
-
-    // function showReview(event) {
-    //     event.preventDefault()
-    //     const id = event.target.dataset.boardgameId
-    //     getOneBoardGame(id)
-    //         .then(boardgame => {
-    //             const reviewShow = `<div>
-    //                 <p>Review: ${boardgame.review.content}</p>               
-    //             </div>`
-    //             showRPanel.innerHTML = reviewShow
-    //         })
-    // }
-
-    
-    // function getReview() {
-    //     return fetch(reviewURL + `/${id}`)
-    //         .then(res => res.json())
-    // }
 
     // this works but trying another way ----- got stuck on reviews 
     // function showBoardGame(event) {
@@ -225,4 +200,11 @@ document.addEventListener("DOMContentLoaded", function() {
     //             </div>`
     //             showBGPanel.innerHTML = boardGameShow
     //         })
+    // }
+    // function reviewLi(review) {
+    //     const li = document.createElement('li')
+    //     li.dataset.reviewId = review.id
+    //     li.textContent = review.content
+    //     li.addEventListener('click', showReview)
+    //     listPanel.appendChild(li)
     // }
