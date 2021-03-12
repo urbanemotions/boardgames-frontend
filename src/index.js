@@ -1,6 +1,7 @@
 const baseURL = "http://localhost:3000/api/v1/boardgames"
 const reviewURL = "http://localhost:3000/api/v1/reviews"
 const userURL = "http://localhost:3000/api/v1/users"
+
 // global variables 
 let boardgame_id = 0
 let currentUser = {}
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function listOfBoardGames(boardgames) {
         boardgames.forEach(boardgame => {
             boardgameLi(boardgame)
-            console.log(boardgame.reviews)
+            // console.log(boardgame.reviews)
         })
     }
 
@@ -41,12 +42,13 @@ document.addEventListener("DOMContentLoaded", function() {
     // click
     // gets the selected board game and display it in the showBGPanel
     // no need for button as no changes can be made to the board game
-    function showBoardGame(boardgame, event) {
+    function showBoardGame(boardgame) {
         showBGPanel.innerHTML = '';
         boardgame_id = boardgame.id 
         let div = document.createElement('div')
         let ul = document.createElement('ul')
         ul.id = "review-list"
+
         // dont think i need this?
         // ul.dataset.boardgameId = boardgame.id
         let boardGameImage = document.createElement('img')
@@ -67,18 +69,21 @@ document.addEventListener("DOMContentLoaded", function() {
         reviewHeading.textContent = `Reviews: `
 
         boardgame.reviews.forEach(review => {
+            // reviewDelete(review)
             let reviewBG = document.createElement('li')
             reviewBG.innerText = `${review.user.name}: ${review.content}` 
-            review_id = review.id
+            // review_id = review.id
             // ul.dataset.reviewId = review.id
             const button = document.createElement('button')
             // button.textContent = "UPDATE"
             // button.addEventListener('click', ()=> {updateReview(review)})
             button.textContent = "Delete"
-            button.addEventListener('click', ()=> {deleteReview(review_id)})
-            
+            button.addEventListener('click', ()=> {
+                deleteReview(review.id)
+                button.parentElement.remove()
+            })
             ul.appendChild(reviewBG)
-            ul.appendChild(button)
+            reviewBG.appendChild(button)
         })
         div.append(boardGameImage, name, theme, duration, playernum, age, description, reviewHeading, ul)
         showBGPanel.appendChild(div)
@@ -129,21 +134,45 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(res => res.json())
         .then(review => {
+            console.log(review)
             const ul = document.querySelector("#review-list")
             let reviewBG = document.createElement('li')
             reviewBG.innerText = `${review.user.name}: ${review.content}` 
-            const button = document.createElement('button')
-            button.textContent = "Delete"
-            button.addEventListener('click', ()=> {deleteReview(review.id)})
-                //     li.dataset.reviewId = review.id
+            const btn = document.createElement('button')
+            btn.textContent = "Delete"
+            btn.setAttribute('review-id', review.id)
+            btn.addEventListener('click', ()=> {
+                deleteReview(review.id)
+                btn.parentElement.remove()
+            })
             ul.appendChild(reviewBG)
-            ul.appendChild(button)
+            reviewBG.appendChild(btn)
         })
     })
 
+    // function reviewDelete(review) {
+    //     let ul = document.createElement('ul')
+    //     ul.id = "review-list"
+    //     let reviewBG = document.createElement('li')
+    //     reviewBG.innerText = `${review.user.name}: ${review.content}` 
+    //     const button = document.createElement('button')
+    //     button.textContent = "Delete"
+    //     button.setAttribute('review-id', review.id)
+    //     button.addEventListener('click', ()=> {
+    //         deleteReview(review.id)
+    //         button.parentElement.remove()
+    //     })
+    //     ul.appendChild(reviewBG)
+    //     ul.appendChild(button)
+    // }
+
+// update not working 
     function updateReview(review) {
         // event.preventDefault()
         // const id = event.target.dataset.id
+        // const updateButton = document.createElement('button')
+        // updateButton.textContent = "UPDATE"
+        // ul.appendChild(reviewBG)
         let updateReview = {
             review: review_id,
             boardgameId: boardgame_id, 
@@ -160,9 +189,6 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(res => res.json())
         .then(review => {
             const ul = document.querySelector("#review-list")
-            // const updateButton = document.createElement('button')
-            // updateButton.textContent = "UPDATE"
-            // ul.appendChild(reviewBG)
         })
     }
 
@@ -172,13 +198,24 @@ document.addEventListener("DOMContentLoaded", function() {
             method: 'DELETE'
         })
         .then(res => res.json())
-        .then(() => {
-            let dReview = document.getElementById(review_id)
-            dReview.remove()
-        })
     }
+
     getAllBoardGames() 
 });
+
+         //     li.dataset.reviewId = review.id
+        // console.log(review_id)
+
+        // .then(review => {
+        //     let dReview = document.getElementById(review_id)
+        //     dReview.parentElement.remove();
+        // })
+        // .then(()=> {
+        //     let dReview = document.querySelector(`[review-id='${review_id}']`)
+        //     console.log(dReview)
+        //     dReview.parentElement.remove()
+        // })
+
 
 
 
@@ -201,10 +238,4 @@ document.addEventListener("DOMContentLoaded", function() {
     //             showBGPanel.innerHTML = boardGameShow
     //         })
     // }
-    // function reviewLi(review) {
-    //     const li = document.createElement('li')
-    //     li.dataset.reviewId = review.id
-    //     li.textContent = review.content
-    //     li.addEventListener('click', showReview)
-    //     listPanel.appendChild(li)
-    // }
+    
