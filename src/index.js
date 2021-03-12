@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
         listPanel.appendChild(li)
     }
 
-    // click
     // gets the selected board game and display it in the showBGPanel
     // no need for button as no changes can be made to the board game
     function showBoardGame(boardgame) {
@@ -48,9 +47,6 @@ document.addEventListener("DOMContentLoaded", function() {
         let div = document.createElement('div')
         let ul = document.createElement('ul')
         ul.id = "review-list"
-
-        // dont think i need this?
-        // ul.dataset.boardgameId = boardgame.id
         let boardGameImage = document.createElement('img')
         boardGameImage.src = `${boardgame.image_url}`
         let name = document.createElement('h1')
@@ -71,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
         boardgame.reviews.forEach(review => {
             // reviewDelete(review)
             let reviewBG = document.createElement('li')
-            reviewBG.innerText = `${review.user.name}: ${review.content}` 
+            reviewBG.innerText = `${review.user.name}: ${review.content} ` 
             // review_id = review.id
             // ul.dataset.reviewId = review.id
             const button = document.createElement('button')
@@ -137,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(review)
             const ul = document.querySelector("#review-list")
             let reviewBG = document.createElement('li')
-            reviewBG.innerText = `${review.user.name}: ${review.content}` 
+            reviewBG.innerText = `${review.user.name}: ${review.content} ` 
             const btn = document.createElement('button')
             btn.textContent = "Delete"
             btn.setAttribute('review-id', review.id)
@@ -166,33 +162,33 @@ document.addEventListener("DOMContentLoaded", function() {
     //     ul.appendChild(button)
     // }
 
-// update not working 
-    function updateReview(review) {
-        // event.preventDefault()
-        // const id = event.target.dataset.id
-        // const updateButton = document.createElement('button')
-        // updateButton.textContent = "UPDATE"
-        // ul.appendChild(reviewBG)
-        let updateReview = {
-            review: review_id,
-            boardgameId: boardgame_id, 
-            userId: currentUser.id
-        }  
-        fetch(reviewURL + `/${id}`, {
-            method: 'PATCH',
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }, 
-            body: JSON.stringify(updateReview)
-        })
-        .then(res => res.json())
-        .then(review => {
-            const ul = document.querySelector("#review-list")
-        })
-    }
+    // update not working 
+    // function updateReview(review) {
+    //     // event.preventDefault()
+    //     // const id = event.target.dataset.id
+    //     // const updateButton = document.createElement('button')
+    //     // updateButton.textContent = "UPDATE"
+    //     // ul.appendChild(reviewBG)
+    //     let updateReview = {
+    //         review: review_id,
+    //         boardgameId: boardgame_id, 
+    //         userId: currentUser.id
+    //     }  
+    //     fetch(reviewURL + `/${id}`, {
+    //         method: 'PATCH',
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Accept": "application/json"
+    //         }, 
+    //         body: JSON.stringify(updateReview)
+    //     })
+    //     .then(res => res.json())
+    //     .then(review => {
+    //         const ul = document.querySelector("#review-list")
+    //     })
+    // }
 
-// delete review instead of update review 
+    // delete review
     function deleteReview(review_id) {
         fetch(`${reviewURL}/${review_id}`, {
             method: 'DELETE'
@@ -216,11 +212,6 @@ document.addEventListener("DOMContentLoaded", function() {
         //     dReview.parentElement.remove()
         // })
 
-
-
-
-
-
     // this works but trying another way ----- got stuck on reviews 
     // function showBoardGame(event) {
     //     const id = event.target.dataset.boardgameId
@@ -238,4 +229,3 @@ document.addEventListener("DOMContentLoaded", function() {
     //             showBGPanel.innerHTML = boardGameShow
     //         })
     // }
-    

@@ -1,0 +1,23 @@
+h1, header {
+    color: #af4c9e;
+    font-size: 1em;
+    text-align: left;
+    text-decoration: underline;
+}
+
+div#show-bg-panel { 
+    color: #af4c9e;
+}
+
+body {
+    background-color: #dbfcf2;
+    display: grid;
+	grid-template-columns: 2fr 8fr
+}
+
+button {
+    font-size: .85em;
+    color: #fff;
+    background-color: rgb(107, 0, 128);
+    border-radius: 20px;
+}
